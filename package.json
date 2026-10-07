@@ -1,10 +1,26 @@
 {
   "scripts": {
-    "build": "theme-package"
+    "dev": "concurrently -n css,js -c cyan,yellow \"pnpm run dev:css\" \"pnpm run dev:js\"",
+    "dev:css": "tailwindcss -i ./src/css/main.css -o ./templates/assets/css/style.css --watch=always",
+    "dev:js": "esbuild src/js/main.ts --bundle --splitting --format=esm --target=es2022 --outdir=templates/assets/js --chunk-names=chunks/[name]-[hash] --watch",
+    "typecheck": "tsc --noEmit",
+    "build-only": "tailwindcss -i ./src/css/main.css -o ./templates/assets/css/style.css --minify && rm -rf templates/assets/js/chunks && esbuild src/js/main.ts --bundle --splitting --format=esm --target=es2022 --minify --outdir=templates/assets/js --chunk-names=chunks/[name]-[hash]",
+    "build": "pnpm run typecheck && pnpm run build-only && theme-package"
   },
   "license": "GPL-3.0",
   "packageManager": "pnpm@10.6.5+sha512.cdf928fca20832cd59ec53826492b7dc25dc524d4370b6b4adbf65803d32efaa6c1c88147c0ae4e8d579a6c9eec715757b50d4fa35eea179d868eada4ed043af",
   "devDependencies": {
-    "@halo-dev/theme-package-cli": "^1.0.0"
+    "@fontsource-variable/inter": "^5.3.0",
+    "@halo-dev/theme-package-cli": "^1.0.0",
+    "@tailwindcss/cli": "^4.3.3",
+    "@tailwindcss/typography": "^0.5.20",
+    "concurrently": "^10.0.5",
+    "daisyui": "^5.7.43",
+    "esbuild": "^0.28.2",
+    "gsap": "^3.15.0",
+    "lenis": "^1.3.26",
+    "lucide-static": "^1.52.0",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^7.0.2"
   }
 }

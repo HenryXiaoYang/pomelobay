@@ -3,11 +3,757 @@ kind: Setting
 metadata:
   name: theme-starter-setting
 spec:
+  # The palette lives in src/css/main.css as a daisyUI theme - it is not
+  # exposed here, because changing one color breaks the verified contrast set.
+  #
+  # Brand and footer fields below are OVERRIDES with a system fallback, which
+  # is the pattern Halo's settings guide sanctions. Leave one empty and the
+  # template falls back to the Halo system setting (site.logo / site.title /
+  # site.subtitle) rather than rendering nothing.
+  #
+  # Navigation comes from Halo's Menus feature via menuFinder.getPrimary().
   forms:
-    - group: style
-      label: 样式
+    - group: brand
+      label: Brand
       formSchema:
-        - $formkit: color
-          name: background_color
-          label: 背景颜色
-          value: "#f2f2f2"
+        - $formkit: attachment
+          name: logo
+          label: Logo
+          help: Overrides the system logo. Leave empty to use Halo's site logo.
+          width: 8rem
+          accepts:
+            - image/png
+            - image/jpeg
+            - image/svg+xml
+            - image/webp
+            - image/avif
+          value: ""
+        - $formkit: text
+          name: wordmark
+          label: Wordmark
+          help: Text next to the logo. Leave empty to use the site title.
+          value: ""
+        - $formkit: number
+          name: logo_height
+          label: Logo height (px)
+          value: 36
+
+    - group: hero
+      label: Hero
+      formSchema:
+        - $formkit: text
+          name: headline
+          label: Headline
+          help: Leave empty to fall back to the site title
+          value: ""
+        - $formkit: textarea
+          name: description
+          label: Description
+          rows: 4
+          value: ""
+        - $formkit: array
+          name: slides
+          label: Carousel images
+          help: Three or more works best. Portrait crops around 4:5 fit the layout.
+          value: []
+          min: 1
+          max: 8
+          itemLabels:
+            - type: image
+              label: $value.image
+            - type: text
+              label: $value.alt
+          children:
+            - $formkit: attachment
+              name: image
+              label: Image
+              aspectRatio: 4/5
+              accepts:
+                - image/png
+                - image/jpeg
+                - image/webp
+                - image/avif
+              value: ""
+            - $formkit: text
+              name: alt
+              label: Alt text
+              help: Describes the image for screen readers
+              value: ""
+        - $formkit: number
+          name: interval
+          label: Autoplay interval (seconds)
+          help: Set to 0 to disable autoplay
+          value: 6
+
+    # Homepage section under the hero. Empty member list hides the section.
+    - group: about
+      label: About Us
+      formSchema:
+        - $formkit: text
+          name: heading
+          label: Heading
+          value: "About Us"
+        - $formkit: textarea
+          name: description
+          label: Introduction
+          help: Optional paragraph beside the heading
+          rows: 3
+          value: ""
+        - $formkit: array
+          name: members
+          label: Members
+          help: Three fits the layout best. Photos are cropped to a circle, so square ones work best.
+          max: 6
+          itemLabels:
+            - type: image
+              label: $value.photo
+            - type: text
+              label: $value.name
+          value:
+            - name: "Member name"
+              role: "Role"
+              intro: "Two or three sentences about who they are and what they do at Pomelo Bay."
+              photo: ""
+            - name: "Member name"
+              role: "Role"
+              intro: "Two or three sentences about who they are and what they do at Pomelo Bay."
+              photo: ""
+            - name: "Member name"
+              role: "Role"
+              intro: "Two or three sentences about who they are and what they do at Pomelo Bay."
+              photo: ""
+          children:
+            - $formkit: attachment
+              name: photo
+              label: Photo
+              aspectRatio: 1/1
+              accepts:
+                - image/png
+                - image/jpeg
+                - image/webp
+                - image/avif
+              value: ""
+            - $formkit: text
+              name: name
+              label: Name
+              value: ""
+            - $formkit: text
+              name: role
+              label: Role
+              value: ""
+            - $formkit: textarea
+              name: intro
+              label: Introduction
+              rows: 3
+              value: ""
+
+    # Homepage section after About Us. Empty heading hides the section.
+    - group: challenges
+      label: Challenges
+      formSchema:
+        - $formkit: text
+          name: heading
+          label: Heading
+          value: "What are the Challenges?"
+        - $formkit: textarea
+          name: body
+          label: Paragraph
+          rows: 6
+          value: "There are more than 270 million migrant workers in China, and tens of millions of children accompanying them. In Shanghai, it is estimated that 4 out of every 10 children are migrant children. For children of migrant workers, educational opportunities are even fewer because, unlike children with Shanghai hukou, they cannot attend public schools for free. Their parents are forced to bear the expensive tuition fees."
+        - $formkit: text
+          name: stat_value
+          label: Big figure
+          help: Shown as typed, so include the separators (270,000,000)
+          value: "270,000,000"
+        - $formkit: text
+          name: stat_label
+          label: Big figure caption
+          value: "Migrant workers in China"
+        - $formkit: select
+          name: ratio_icon
+          label: Pictogram - figure
+          help: Counted figures are drawn filled, the rest as outlines, so only solid shapes are offered
+          value: user-round
+          options:
+            - label: Person (round)
+              value: user-round
+            - label: Person
+              value: user
+            - label: Heart
+              value: heart
+            - label: House
+              value: house
+            - label: Star
+              value: star
+        - $formkit: number
+          name: ratio_count
+          label: Pictogram - highlighted people
+          value: 4
+        - $formkit: number
+          name: ratio_total
+          label: Pictogram - total people
+          help: Up to 20. Set to 0 to hide the pictogram.
+          value: 10
+        - $formkit: text
+          name: ratio_label
+          label: Pictogram caption
+          help: Also read out to screen readers in place of the icons
+          value: "4 out of every 10 children in Shanghai are migrant children"
+        - $formkit: text
+          name: points_heading
+          label: List heading
+          value: "Behind the numbers"
+        - $formkit: array
+          name: points
+          label: List
+          max: 8
+          itemLabels:
+            - type: text
+              label: $value.title
+          value:
+            - icon: map-pin
+              title: "Migrant children"
+              text: "Migrant children are minors aged 0–17 who currently live in a region different from where their hukou is registered."
+            - icon: id-card
+              title: "Hukou"
+              text: "Hukou is a household registration system in mainland China that gives hukou holders entitlements in their own town, city, province or region, such as access to hospitals and schools."
+            - icon: file-check
+              title: "Entry requirements"
+              text: "To attend school in Shanghai, migrant children have to hold a Shanghai Residence Permit or Residence Registration Certificate and fulfil many criteria to be admitted to public schools."
+            - icon: school
+              title: "If they don't qualify"
+              text: "If the children and their families cannot satisfy these criteria, they must either go to government-funded schools for migrant children or pay pricey tuition at bilingual or international schools."
+          children:
+            # Icon pickers share one list; every value needs a case in templates/partials/icon.html
+            - $formkit: select
+              name: icon
+              label: Icon
+              value: map-pin
+              options:
+                - label: Map pin
+                  value: map-pin
+                - label: ID card
+                  value: id-card
+                - label: Document check
+                  value: file-check
+                - label: School
+                  value: school
+                - label: Graduation cap
+                  value: graduation-cap
+                - label: Open book
+                  value: book-open
+                - label: Government building
+                  value: landmark
+                - label: Wallet
+                  value: wallet
+                - label: House
+                  value: house
+                - label: People
+                  value: users
+                - label: Person
+                  value: user
+                - label: Person (round)
+                  value: user-round
+                - label: Calendar
+                  value: calendar
+                - label: Award
+                  value: award
+                - label: Trophy
+                  value: trophy
+                - label: Star
+                  value: star
+                - label: Smile
+                  value: smile
+                - label: Handshake
+                  value: handshake
+                - label: Megaphone
+                  value: megaphone
+                - label: Light bulb
+                  value: lightbulb
+                - label: Heart
+                  value: heart
+                - label: Sparkles
+                  value: sparkles
+            - $formkit: text
+              name: title
+              label: Title
+              value: ""
+            - $formkit: textarea
+              name: text
+              label: Text
+              rows: 3
+              value: ""
+
+    # Homepage section after Challenges. Empty statement hides the section.
+    - group: vision
+      label: Vision
+      formSchema:
+        - $formkit: text
+          name: heading
+          label: Heading
+          value: "Vision"
+        - $formkit: textarea
+          name: statement
+          label: Statement
+          rows: 4
+          value: "Through the combination of persistent offline teaching and online interactive learning, we aim to provide whole-person education to help migrant children better adapt to their residence's location education."
+        - $formkit: attachment
+          name: image
+          label: Photo
+          help: Cropped to 2:1 (wide). Leave empty and the statement centres on its own.
+          aspectRatio: 2/1
+          accepts:
+            - image/png
+            - image/jpeg
+            - image/webp
+            - image/avif
+          value: ""
+        - $formkit: text
+          name: image_alt
+          label: Photo alt text
+          help: Describes the photo for screen readers
+          value: ""
+
+    # Homepage section after Vision. Empty message hides the section.
+    - group: mission
+      label: Mission
+      formSchema:
+        - $formkit: text
+          name: heading
+          label: Heading
+          value: "Mission"
+        - $formkit: text
+          name: message
+          label: Message
+          help: One short line - it is set very large
+          value: "Level up holistic education for everyone."
+        - $formkit: text
+          name: highlight
+          label: Circled word
+          help: A word or short phrase copied exactly from the message. Leave empty for no circle.
+          value: "holistic"
+
+    # Homepage closing band after Mission. Empty column list hides it.
+    - group: influence
+      label: Influence
+      formSchema:
+        - $formkit: text
+          name: heading
+          label: Heading
+          value: "Influence"
+        - $formkit: array
+          name: columns
+          label: Columns
+          help: Three fits the layout best
+          max: 3
+          itemLabels:
+            - type: text
+              label: $value.value
+            - type: text
+              label: $value.label
+          value:
+            - label: "We have"
+              value: "131+"
+              unit: "NGO members"
+              goal: false
+              facts: ""
+              list_title: ""
+              list_icon: school
+              list: ""
+              note: ""
+            - label: "Local scale"
+              value: "1,600"
+              unit: "students"
+              goal: false
+              facts: "100 students taught\n1,500 students received books"
+              list_title: "Partner schools"
+              list_icon: school
+              list: "Shanghai Chenta Road Primary School\nShanghai Tangwan Primary School\nSichuan Mari Township Primary School\nZhengzhou Foreign Language School"
+              note: ""
+            - label: "National scale"
+              value: ">1,000,000"
+              unit: "students"
+              goal: true
+              facts: ""
+              list_title: ""
+              list_icon: school
+              list: ""
+              note: "In the future, we wish to help more than 1 million migrant children in Shanghai → 982 million in China."
+          children:
+            - $formkit: text
+              name: label
+              label: Label
+              help: Small text above the figure
+              value: ""
+            - $formkit: text
+              name: value
+              label: Figure
+              help: Shown as typed (131+, 1,600, >1,000,000)
+              value: ""
+            - $formkit: text
+              name: unit
+              label: Unit
+              value: ""
+            - $formkit: checkbox
+              name: goal
+              label: This is a goal, not a result
+              help: Sets the figure in italic
+              value: false
+            - $formkit: textarea
+              name: facts
+              label: Smaller figures
+              help: One per line, figure first - "100 students taught"
+              rows: 3
+              value: ""
+            - $formkit: text
+              name: list_title
+              label: List title
+              value: ""
+            - $formkit: select
+              name: list_icon
+              label: List icon
+              value: school
+              options:
+                - label: Map pin
+                  value: map-pin
+                - label: ID card
+                  value: id-card
+                - label: Document check
+                  value: file-check
+                - label: School
+                  value: school
+                - label: Graduation cap
+                  value: graduation-cap
+                - label: Open book
+                  value: book-open
+                - label: Government building
+                  value: landmark
+                - label: Wallet
+                  value: wallet
+                - label: House
+                  value: house
+                - label: People
+                  value: users
+                - label: Person
+                  value: user
+                - label: Person (round)
+                  value: user-round
+                - label: Calendar
+                  value: calendar
+                - label: Award
+                  value: award
+                - label: Trophy
+                  value: trophy
+                - label: Star
+                  value: star
+                - label: Smile
+                  value: smile
+                - label: Handshake
+                  value: handshake
+                - label: Megaphone
+                  value: megaphone
+                - label: Light bulb
+                  value: lightbulb
+                - label: Heart
+                  value: heart
+                - label: Sparkles
+                  value: sparkles
+            - $formkit: textarea
+              name: list
+              label: List
+              help: One item per line
+              rows: 4
+              value: ""
+            - $formkit: textarea
+              name: note
+              label: Note
+              rows: 3
+              value: ""
+
+    # Homepage section after Influence. Empty list hides the section.
+    - group: pitches
+      label: Pitches
+      formSchema:
+        - $formkit: text
+          name: heading
+          label: Heading
+          value: "We also pitched to amplify awareness…"
+        - $formkit: array
+          name: items
+          label: Events
+          help: Two fits the layout best; more wrap into further rows
+          max: 6
+          itemLabels:
+            - type: image
+              label: $value.image
+            - type: text
+              label: $value.title
+          value:
+            - title: "Fuxing Foundation"
+              badge: ""
+              badge_icon: award
+              place: "Shanghai, China"
+              date: "August 2025"
+              image: ""
+              alt: ""
+            - title: "Diamond Challenge"
+              badge: "Finalist"
+              badge_icon: award
+              place: "University of Delaware, USA"
+              date: "April 2025"
+              image: ""
+              alt: ""
+          children:
+            - $formkit: attachment
+              name: image
+              label: Photo
+              aspectRatio: 3/2
+              accepts:
+                - image/png
+                - image/jpeg
+                - image/webp
+                - image/avif
+              value: ""
+            - $formkit: text
+              name: alt
+              label: Photo alt text
+              value: ""
+            - $formkit: text
+              name: title
+              label: Event
+              value: ""
+            - $formkit: text
+              name: badge
+              label: Distinction
+              help: Optional badge next to the event, e.g. Finalist
+              value: ""
+            - $formkit: select
+              name: badge_icon
+              label: Distinction icon
+              value: award
+              options:
+                - label: Map pin
+                  value: map-pin
+                - label: ID card
+                  value: id-card
+                - label: Document check
+                  value: file-check
+                - label: School
+                  value: school
+                - label: Graduation cap
+                  value: graduation-cap
+                - label: Open book
+                  value: book-open
+                - label: Government building
+                  value: landmark
+                - label: Wallet
+                  value: wallet
+                - label: House
+                  value: house
+                - label: People
+                  value: users
+                - label: Person
+                  value: user
+                - label: Person (round)
+                  value: user-round
+                - label: Calendar
+                  value: calendar
+                - label: Award
+                  value: award
+                - label: Trophy
+                  value: trophy
+                - label: Star
+                  value: star
+                - label: Smile
+                  value: smile
+                - label: Handshake
+                  value: handshake
+                - label: Megaphone
+                  value: megaphone
+                - label: Light bulb
+                  value: lightbulb
+                - label: Heart
+                  value: heart
+                - label: Sparkles
+                  value: sparkles
+            - $formkit: text
+              name: place
+              label: Place
+              value: ""
+            - $formkit: text
+              name: date
+              label: Date
+              value: ""
+
+    # Homepage section after Pitches. Empty outcome list hides the section.
+    - group: progress
+      label: Positive Progress
+      formSchema:
+        - $formkit: text
+          name: heading
+          label: Heading
+          value: "Positive Progress"
+        - $formkit: textarea
+          name: body
+          label: Paragraph
+          rows: 4
+          value: "By providing a set of high-quality and diverse classes that extend the knowledge currently taught in school, with particular emphasis on developing strong character traits such as self-expression and critical thinking."
+        - $formkit: array
+          name: outcomes
+          label: Outcomes
+          max: 6
+          itemLabels:
+            - type: text
+              label: $value.text
+          value:
+            - icon: smile
+              text: "Increase in self-confidence"
+            - icon: handshake
+              text: "Learns to cooperate with others"
+            - icon: megaphone
+              text: "Can better express their ideas and gain their voice"
+          children:
+            # Icon pickers share one list; every value needs a case in templates/partials/icon.html
+            - $formkit: select
+              name: icon
+              label: Icon
+              value: smile
+              options:
+                - label: Map pin
+                  value: map-pin
+                - label: ID card
+                  value: id-card
+                - label: Document check
+                  value: file-check
+                - label: School
+                  value: school
+                - label: Graduation cap
+                  value: graduation-cap
+                - label: Open book
+                  value: book-open
+                - label: Government building
+                  value: landmark
+                - label: Wallet
+                  value: wallet
+                - label: House
+                  value: house
+                - label: People
+                  value: users
+                - label: Person
+                  value: user
+                - label: Person (round)
+                  value: user-round
+                - label: Calendar
+                  value: calendar
+                - label: Award
+                  value: award
+                - label: Trophy
+                  value: trophy
+                - label: Star
+                  value: star
+                - label: Smile
+                  value: smile
+                - label: Handshake
+                  value: handshake
+                - label: Megaphone
+                  value: megaphone
+                - label: Light bulb
+                  value: lightbulb
+                - label: Heart
+                  value: heart
+                - label: Sparkles
+                  value: sparkles
+            - $formkit: text
+              name: text
+              label: Outcome
+              value: ""
+
+    - group: footer
+      label: Footer
+      formSchema:
+        - $formkit: text
+          name: heading
+          label: Heading
+          help: Leave empty to use the site title
+          value: ""
+        - $formkit: textarea
+          name: description
+          label: Description
+          rows: 3
+          help: Leave empty to use the site subtitle
+          value: ""
+        - $formkit: array
+          name: links
+          label: Links
+          value: []
+          max: 8
+          itemLabels:
+            - type: text
+              label: $value.label
+          children:
+            - $formkit: text
+              name: label
+              label: Label
+              value: ""
+            - $formkit: text
+              name: url
+              label: URL
+              value: ""
+
+    - group: labels
+      label: Interface text
+      formSchema:
+        - $formkit: text
+          name: tags_title
+          label: Tags page title
+          value: "Tags"
+        - $formkit: text
+          name: categories_title
+          label: Categories page title
+          value: "Categories"
+        - $formkit: text
+          name: prev_page
+          label: Pagination - previous
+          value: "Previous"
+        - $formkit: text
+          name: next_page
+          label: Pagination - next
+          value: "Next"
+        - $formkit: text
+          name: skip_to_content
+          label: Skip-to-content link
+          value: "Skip to content"
+        - $formkit: text
+          name: search
+          label: Search button label
+          value: "Search"
+        - $formkit: text
+          name: open_menu
+          label: Menu button label
+          value: "Open menu"
+        - $formkit: text
+          name: primary_nav
+          label: Primary navigation label
+          help: Read by screen readers only
+          value: "Primary"
+        - $formkit: text
+          name: carousel
+          label: Carousel label
+          help: Read by screen readers only
+          value: "Photo highlights"
+        - $formkit: text
+          name: prev_slide
+          label: Carousel - previous slide
+          value: "Previous slide"
+        - $formkit: text
+          name: next_slide
+          label: Carousel - next slide
+          value: "Next slide"
+        - $formkit: text
+          name: pause_slideshow
+          label: Carousel - pause
+          value: "Pause slideshow"
+        - $formkit: text
+          name: play_slideshow
+          label: Carousel - play
+          value: "Play slideshow"

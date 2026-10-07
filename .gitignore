@@ -24,3 +24,13 @@ node_modules
 .gradle
 build
 dist
+
+# Tailwind / esbuild build output (CI regenerates it via pnpm build)
+templates/assets/css/style.css
+templates/assets/js/main.js
+templates/assets/js/chunks/
+
+# Local-only placeholder assets. Never packaged - theme-package only ships
+# templates/, theme.yaml, settings.yaml, LICENSE and README.md.
+dev/placeholders/*
+!dev/placeholders/README.md

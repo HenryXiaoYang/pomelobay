@@ -4,7 +4,18 @@
   th:replace="~{layout :: html(head = null,content = ~{::content})}"
 >
   <th:block th:fragment="content">
-    <h1 th:text="${post.spec.title}"></h1>
-    <article th:utext="${post.content.content}"></article>
+    <article class="mx-auto w-full max-w-3xl px-6 py-16 sm:px-10">
+      <h1
+        class="text-4xl font-bold leading-tight sm:text-5xl"
+        th:text="${post.spec.title}"
+      ></h1>
+      <!-- Post bodies are raw HTML from Halo's database. Tailwind can't scan
+           them and preflight flattens headings and lists, so .prose is the
+           only thing keeping content readable. -->
+      <div
+        class="prose prose-lg mt-10 max-w-none"
+        th:utext="${post.content.content}"
+      ></div>
+    </article>
   </th:block>
 </html>

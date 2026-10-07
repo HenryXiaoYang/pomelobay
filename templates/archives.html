@@ -4,23 +4,26 @@
   th:replace="~{layout :: html(head = null,content = ~{::content})}"
 >
   <th:block th:fragment="content">
-    <th:block th:each="archive : ${archives.items}">
-      <h1 th:text="${archive.year}"></h1>
-      <ul class="listing">
-        <th:block th:each="month : ${archive.months}">
-          <li th:each="post : ${month.posts}">
-            <a
-              th:href="@{${post.status.permalink}}"
-              th:title="${post.spec.title}"
-              th:text="${post.spec.title}"
-            ></a>
-          </li>
-        </th:block>
-      </ul>
-    </th:block>
-    <a th:if="${archives.hasPrevious()}" th:href="@{${archives.prevUrl}}">
-      上一页
-    </a>
-    <a th:if="${archives.hasNext()}" th:href="@{${archives.nextUrl}}">下一页</a>
+    <div class="mx-auto w-full max-w-3xl px-6 py-16 sm:px-10">
+      <th:block th:each="archive : ${archives.items}">
+        <h2
+          class="mt-12 text-2xl font-bold first:mt-0"
+          th:text="${archive.year}"
+        ></h2>
+        <ul class="list mt-3 text-base">
+          <th:block th:each="month : ${archive.months}">
+            <li th:each="post : ${month.posts}" class="list-row px-0">
+              <a
+                class="link link-hover list-col-grow font-medium"
+                th:href="@{${post.status.permalink}}"
+                th:title="${post.spec.title}"
+                th:text="${post.spec.title}"
+              ></a>
+            </li>
+          </th:block>
+        </ul>
+      </th:block>
+      <th:block th:replace="~{partials/pagination :: pagination(${archives})}" />
+    </div>
   </th:block>
 </html>

@@ -1,6 +1,8 @@
 <!doctype html>
 <html
   lang="en"
+  th:lang="${#locale.toLanguageTag}"
+  data-theme="pomelobay"
   xmlns:th="https://www.thymeleaf.org"
   th:fragment="html (head,content)"
 >
@@ -12,22 +14,195 @@
       content="width=device-width, initial-scale=1, maximum-scale=2"
     />
     <title th:text="${site.title}"></title>
+    <!-- Preload the faces every page renders above the fold: Inter for the
+         nav and titles, Caladea Regular for running text. Pages whose first
+         screen needs another face add it through the `head` fragment (the
+         homepage preloads Caladea Bold for its headline). The italic faces
+         are declared in CSS and only fetched on use. -->
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      crossorigin
+      th:href="@{/assets/fonts/Inter-Variable.woff2}"
+    />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      crossorigin
+      th:href="@{/assets/fonts/Caladea-Regular.woff2}"
+    />
     <link
       rel="stylesheet"
       th:href="@{/assets/css/style.css?v={version}(version=${theme.spec.version})}"
     />
     <script
+      type="module"
       th:src="@{/assets/js/main.js?v={version}(version=${theme.spec.version})}"
     ></script>
     <th:block th:if="${head != null}">
       <th:block th:replace="${head}" />
     </th:block>
   </head>
+
+  <!-- Every user-facing string below is a theme setting with a built-in
+       default, so nothing here is hardcoded. Brand fields fall back to the
+       Halo system settings when left empty. -->
   <body
-    th:style="'background-color: '+${theme.config.style.background_color ?: '#f2f2f2'}"
+    class="bg-base-100 text-base-content flex min-h-screen flex-col"
+    th:with="brand = ${theme.config?.brand}, t = ${theme.config?.labels}, foot = ${theme.config?.footer}"
   >
-    <section>
+    <a
+      th:href="@{#main}"
+      class="btn btn-neutral btn-sm sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50"
+      th:text="${#strings.isEmpty(t?.skip_to_content) ? 'Skip to content' : t.skip_to_content}"
+    ></a>
+
+    <!-- Header sits flush with the page: same base-100 background, no border.
+         It stays opaque so content scrolls underneath cleanly.
+         navbar min-height is 4rem, which the hero's 100dvh-4rem depends on. -->
+    <header class="bg-base-100 sticky top-0 z-30">
+      <div class="navbar mx-auto w-full max-w-7xl px-4 sm:px-6">
+        <!-- navbar-start/end default to width:50% each, which is too narrow for
+             a logo plus six items - the menu (flex-flow: column wrap) then wraps
+             onto a second row. w-auto + grow lets each side take what it needs. -->
+        <!-- min-w-0 down the chain so that, below lg, the wordmark is what
+             gives way (truncating) when space runs out - a 320px phone with
+             enlarged text - rather than the search and menu buttons being
+             pushed off-screen. From lg the brand is fixed again: the
+             single-row nav is laid out around its full width. -->
+        <div class="navbar-start w-auto min-w-0 grow gap-3 xl:gap-6">
+          <a
+            th:href="@{/}"
+            class="font-sans flex min-w-0 items-center gap-2.5 text-lg font-bold tracking-tight lg:shrink-0 xl:text-xl"
+          >
+            <th:block
+              th:with="logo = ${#strings.isEmpty(brand?.logo) ? site.logo : brand.logo}"
+            >
+              <img
+                th:if="${not #strings.isEmpty(logo)}"
+                th:src="${logo}"
+                th:alt="${site.title}"
+                class="w-auto shrink-0"
+                th:style="'height:' + ${brand?.logo_height ?: 36} + 'px'"
+              />
+            </th:block>
+            <span
+              class="truncate"
+              th:text="${#strings.isEmpty(brand?.wordmark) ? site.title : brand.wordmark}"
+            ></span>
+          </a>
+
+          <!-- th:with has to sit on an outer element: Thymeleaf evaluates th:if
+               at a higher precedence, so a th:if on this tag would read `menu`
+               before th:with defines it. -->
+          <th:block th:with="menu = ${menuFinder.getPrimary()}">
+            <nav
+              th:if="${menu != null}"
+              class="site-nav hidden lg:flex"
+              th:attr="aria-label=${#strings.isEmpty(t?.primary_nav) ? 'Primary' : t.primary_nav}"
+            >
+              <th:block
+                th:replace="~{partials/menu-tree :: tree(items=${menu.menuItems}, ulClass='menu menu-horizontal flex-nowrap gap-0 px-0 font-medium')}"
+              />
+            </nav>
+          </th:block>
+        </div>
+
+        <div class="navbar-end w-auto shrink-0 gap-1">
+          <button
+            th:if="${pluginFinder.available('PluginSearchWidget')}"
+            type="button"
+            class="btn btn-ghost btn-circle size-11"
+            th:attr="aria-label=${#strings.isEmpty(t?.search) ? 'Search' : t.search}"
+            onclick="SearchWidget.open()"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="size-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+            >
+              <circle cx="11" cy="11" r="7" />
+              <path d="m20 20-3.5-3.5" stroke-linecap="round" />
+            </svg>
+          </button>
+
+          <!-- daisyUI dropdown on <details> so it opens without JavaScript -->
+          <details class="dropdown dropdown-end lg:hidden">
+            <summary
+              class="btn btn-ghost btn-circle size-11"
+              th:attr="aria-label=${#strings.isEmpty(t?.open_menu) ? 'Open menu' : t.open_menu}"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="size-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+                aria-hidden="true"
+              >
+                <path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round" />
+              </svg>
+            </summary>
+            <div
+              class="site-menu-mobile dropdown-content bg-base-100 rounded-box z-40 mt-2 w-64 p-2 shadow-xl"
+              th:with="menu = ${menuFinder.getPrimary()}"
+            >
+              <th:block
+                th:if="${menu != null}"
+                th:replace="~{partials/menu-tree :: tree(items=${menu.menuItems}, ulClass='menu w-full')}"
+              />
+            </div>
+          </details>
+        </div>
+      </div>
+    </header>
+
+    <main id="main" class="flex-1">
       <th:block th:replace="${content}" />
-    </section>
+    </main>
+
+    <footer
+      data-paper="base-200"
+      class="footer sm:footer-horizontal bg-base-200 border-base-300 mt-24 border-t px-6 py-10 sm:px-10"
+    >
+      <aside class="mx-auto w-full max-w-7xl">
+        <p
+          class="font-sans text-base font-bold"
+          th:text="${#strings.isEmpty(foot?.heading) ? site.title : foot.heading}"
+        ></p>
+        <!-- th:with on an OUTER element: Thymeleaf runs th:if at a higher
+             precedence than th:with, so a th:if on the same tag would read
+             `desc` before it is defined. -->
+        <th:block
+          th:with="desc = ${#strings.isEmpty(foot?.description) ? site.subtitle : foot.description}"
+        >
+          <p
+            th:if="${not #strings.isEmpty(desc)}"
+            th:text="${desc}"
+            class="max-w-prose text-(--color-ink-muted)"
+          ></p>
+        </th:block>
+        <ul
+          th:if="${not #lists.isEmpty(foot?.links)}"
+          class="mt-2 flex flex-wrap gap-x-5 gap-y-1"
+        >
+          <li th:each="link : ${foot.links}">
+            <a
+              class="link link-hover"
+              th:href="@{${link.url}}"
+              th:text="${link.label}"
+            ></a>
+          </li>
+        </ul>
+        <halo:footer />
+      </aside>
+    </footer>
   </body>
 </html>

@@ -1,0 +1,26 @@
+<!doctype html>
+<html xmlns:th="https://www.thymeleaf.org">
+  <!--
+    Recursive nav fragment. Pure Thymeleaf - no build tooling involved.
+    Menu data comes from Halo's Menus feature; always read status.href and
+    status.displayName, never the spec.* equivalents (Halo's docs are explicit
+    that spec.menuItems and spec.children are deprecated since 2.26.0).
+  -->
+  <ul th:fragment="tree (items, ulClass)" th:class="${ulClass}">
+    <li th:each="item : ${items}">
+      <a
+        th:if="${#lists.isEmpty(item.children)}"
+        th:href="@{${item.status.href}}"
+        th:text="${item.status.displayName}"
+        th:target="${item.spec.target?.value}"
+      ></a>
+      <!-- <details> gives a keyboard-operable submenu with no JavaScript -->
+      <details th:unless="${#lists.isEmpty(item.children)}">
+        <summary th:text="${item.status.displayName}"></summary>
+        <th:block
+          th:replace="~{partials/menu-tree :: tree(items=${item.children}, ulClass='bg-base-100 rounded-box z-20 min-w-48 shadow-lg')}"
+        />
+      </details>
+    </li>
+  </ul>
+</html>
