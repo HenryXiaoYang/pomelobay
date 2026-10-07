@@ -34,7 +34,7 @@
            autoplay and the arrow/pause controls on top. -->
       <div
         th:if="${not #lists.isEmpty(hero?.slides)}"
-        class="hero-fade relative order-1 h-[60vh] sm:h-[70vh] short-landscape:order-none short-landscape:h-auto short-landscape:min-h-[calc(100dvh-4rem)] lg:order-none lg:h-auto lg:min-h-[calc(100dvh-4rem)]"
+        class="hero-fade relative order-1 h-[60svh] sm:h-[70svh] short-landscape:order-none short-landscape:h-auto short-landscape:min-h-[calc(100dvh-4rem)] lg:order-none lg:h-auto lg:min-h-[calc(100dvh-4rem)]"
       >
         <div
           data-carousel
@@ -149,14 +149,20 @@
         <!-- Hero headline is Caladea, unlike the Inter headings elsewhere -
              it reads as the brand statement, not a section label. -->
         <h1
-          class="hero-rise font-serif text-5xl font-bold leading-[1.02] tracking-tight text-balance sm:text-6xl short-landscape:text-5xl lg:text-7xl xl:text-8xl"
+          class="hero-rise font-serif text-5xl font-bold leading-[1.02] tracking-[-0.03em] text-balance sm:text-6xl short-landscape:text-5xl lg:text-7xl xl:text-[5.5rem]"
           th:text="${#strings.isEmpty(hero?.headline) ? site.title : hero.headline}"
         ></h1>
         <p
           th:if="${not #strings.isEmpty(hero?.description)}"
           th:text="${hero.description}"
-          class="hero-rise hero-delay-1 mt-8 max-w-xl text-lg leading-[1.7] text-pretty opacity-75 sm:text-xl"
+          class="hero-rise hero-delay-1 mt-6 max-w-xl text-lg leading-[1.7] text-pretty text-(--color-ink-muted) sm:text-xl"
         ></p>
+        <div
+          th:if="${not #strings.isEmpty(hero?.cta_label) and not #strings.isEmpty(hero?.cta_url)}"
+          class="hero-rise hero-delay-1 mt-10"
+        >
+          <a class="hero-cta" th:href="${hero.cta_url}" th:text="${hero.cta_label}"></a>
+        </div>
       </div>
     </section>
 
@@ -174,16 +180,16 @@
       class="mx-auto w-full max-w-7xl scroll-mt-20 px-6 py-24 sm:px-12 lg:py-32"
       aria-labelledby="about-heading"
     >
-      <div class="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-end lg:gap-12">
+      <div class="max-w-3xl">
         <h2
           id="about-heading"
-          class="font-serif text-4xl font-bold leading-[1.05] tracking-tight text-balance sm:text-5xl lg:col-span-5 lg:text-6xl"
+          class="type-section lg:col-span-5"
           th:text="${#strings.isEmpty(about?.heading) ? 'About Us' : about.heading}"
         ></h2>
         <p
           th:if="${not #strings.isEmpty(about?.description)}"
           th:text="${about.description}"
-          class="max-w-xl text-lg leading-[1.7] text-pretty text-(--color-ink-muted) lg:col-span-6 lg:col-start-7"
+          class="mt-6 max-w-[62ch] text-lg leading-[1.7] text-pretty text-(--color-ink-muted)"
         ></p>
       </div>
 
@@ -196,8 +202,7 @@
           class="grid grid-cols-[96px_minmax(0,1fr)] content-start items-start gap-5 sm:grid-cols-[128px_minmax(0,1fr)] sm:gap-8 md:grid-cols-1 md:gap-7"
         >
           <div
-            class="relative aspect-square w-full overflow-hidden rounded-full md:max-w-56"
-            th:classappend="${stat.index % 3 == 0} ? 'bg-primary' : (${stat.index % 3 == 1} ? 'bg-accent' : 'bg-secondary')"
+            class="bg-accent relative aspect-square w-full overflow-hidden rounded-full md:max-w-56"
           >
             <img
               th:if="${not #strings.isEmpty(member.photo)}"
@@ -212,14 +217,14 @@
             <span
               th:if="${#strings.isEmpty(member.photo) and not #strings.isEmpty(member.name)}"
               th:text="${#strings.substring(member.name, 0, 1)}"
-              class="absolute inset-0 flex items-center justify-center font-serif text-4xl font-bold opacity-80 sm:text-5xl md:text-7xl"
+              class="absolute inset-0 flex items-center justify-center font-serif text-4xl font-bold text-(--color-link) sm:text-5xl md:text-7xl"
               aria-hidden="true"
             ></span>
           </div>
 
           <div class="md:pr-2">
             <h3
-              class="font-serif text-xl font-bold tracking-tight sm:text-2xl"
+              class="type-item"
               th:text="${member.name}"
             ></h3>
             <p
@@ -262,7 +267,7 @@
         <div class="grid grid-cols-1 gap-y-10 lg:grid-cols-12 lg:gap-x-16 lg:gap-y-8">
           <h2
             id="challenges-heading"
-            class="font-serif text-4xl font-bold leading-[1.05] tracking-tight text-balance sm:text-5xl lg:col-span-5 lg:row-start-1 lg:self-end lg:text-6xl"
+            class="type-section lg:col-span-5 lg:row-start-1 lg:self-end"
             th:text="${ch.heading}"
           ></h2>
 
@@ -328,7 +333,7 @@
           <h3
             th:if="${not #strings.isEmpty(ch.points_heading)}"
             th:text="${ch.points_heading}"
-            class="font-serif mt-24 text-2xl font-bold tracking-tight sm:text-3xl lg:mt-32"
+            class="type-title mt-24 lg:mt-32"
           ></h3>
           <ul
             class="mt-10 grid grid-cols-1 gap-x-16 gap-y-12 md:grid-cols-2"
@@ -339,7 +344,7 @@
               class="border-base-300 flex gap-5 border-t pt-8 sm:gap-6"
             >
               <span
-                class="bg-accent text-accent-content grid size-12 shrink-0 place-items-center rounded-full"
+                class="bg-accent grid size-12 shrink-0 place-items-center rounded-full text-(--color-link)"
               >
                 <svg
                   th:replace="~{partials/icon :: icon(${point.icon}, 'size-6')}"
@@ -349,7 +354,7 @@
                 <h4
                   th:if="${not #strings.isEmpty(point.title)}"
                   th:text="${point.title}"
-                  class="font-serif text-xl font-bold tracking-tight"
+                  class="type-item"
                 ></h4>
                 <p
                   th:text="${point.text}"
@@ -364,52 +369,51 @@
     </th:block>
 
     <!-- Vision. One sentence, so it is set as a statement: larger than body
-         copy and in full ink rather than the muted reading colour. Photo left,
-         text right - the mirror of Challenges above, so the page alternates
-         instead of stacking the same split twice. Source order keeps heading
-         and statement first for phones and screen readers; the grid only
-         moves the photo visually from lg. Without a photo the text centres
-         on a reading measure. -->
+         copy and in full ink rather than the muted reading colour. Stacked:
+         statement first, then the photo at full container width. The hero
+         and Challenges are already side-by-side splits, so Vision takes a
+         layout family no other section uses (Section 4.7), and the 2:1
+         photo finally gets the width it was shot for. Without a photo the
+         statement stands alone. -->
     <th:block th:with="vision = ${theme.config?.vision}">
     <section
       id="vision"
       data-snap-section
       th:if="${vision != null and not #strings.isEmpty(vision.statement)}"
-      class="mx-auto w-full max-w-7xl scroll-mt-20 px-6 py-24 sm:px-12 lg:py-32"
+      class="mx-auto w-full max-w-7xl scroll-mt-20 px-6 pt-24 pb-14 sm:px-12 lg:pt-32 lg:pb-20"
       aria-labelledby="vision-heading"
     >
-      <div class="grid grid-cols-1 gap-y-10 lg:grid-cols-12 lg:items-center lg:gap-x-16">
-        <div
-          th:class="${#strings.isEmpty(vision.image)} ? 'lg:col-span-8 lg:col-start-3' : 'lg:col-span-5 lg:col-start-8 lg:row-start-1'"
-        >
-          <h2
-            id="vision-heading"
-            class="font-serif text-4xl font-bold leading-[1.05] tracking-tight text-balance sm:text-5xl lg:text-6xl"
-            th:text="${#strings.isEmpty(vision.heading) ? 'Vision' : vision.heading}"
-          ></h2>
-          <p
-            th:text="${vision.statement}"
-            class="mt-8 max-w-[34ch] text-2xl leading-[1.5] text-pretty sm:text-[1.75rem]"
-          ></p>
-        </div>
-
-        <img
-          th:if="${not #strings.isEmpty(vision.image)}"
-          data-print
-          th:src="${vision.image}"
-          sizes="(min-width: 1280px) 664px, (min-width: 1024px) 52vw, (min-width: 640px) calc(100vw - 96px), calc(100vw - 48px)"
-          th:alt="${vision.image_alt ?: ''}"
-          class="rounded-box aspect-[2/1] w-full object-cover lg:col-span-7 lg:col-start-1 lg:row-start-1"
-          loading="lazy"
-          decoding="async"
-        />
+      <div class="max-w-4xl">
+        <h2
+          id="vision-heading"
+          class="type-section"
+          th:text="${#strings.isEmpty(vision.heading) ? 'Vision' : vision.heading}"
+        ></h2>
+        <p
+          th:text="${vision.statement}"
+          class="mt-8 max-w-[40ch] text-2xl leading-[1.5] text-pretty sm:text-[1.75rem] lg:text-[2rem]"
+        ></p>
       </div>
+
+      <img
+        th:if="${not #strings.isEmpty(vision.image)}"
+        data-print
+        th:src="${vision.image}"
+        sizes="(min-width: 1280px) 1184px, (min-width: 640px) calc(100vw - 96px), calc(100vw - 48px)"
+        th:alt="${vision.image_alt ?: ''}"
+        class="rounded-box mt-12 aspect-[2/1] w-full object-cover lg:mt-16"
+        loading="lazy"
+        decoding="async"
+      />
     </section>
     </th:block>
 
     <!-- Mission. One line, set as the largest text after the hero. The
          highlight word gets a hand-drawn loop - a teacher circling the key
-         word on the board - drawn in the peach key colour. mission.ts plays
+         word on the board - drawn in the peach key colour. The pen overshoots
+         and crosses its own start once, at an angle, then lifts: the closing
+         stroke must never run back alongside the opening one, or the two
+         merge into a flat double bar across the top. mission.ts plays
          it once on arrival (words in reading order, then the loop); without
          JS or under reduced motion the loop is simply already drawn.
          The before/mark/after pieces are kept on ONE line of template on
@@ -420,12 +424,12 @@
       id="mission"
       data-snap-section
       th:if="${mission != null and not #strings.isEmpty(mission.message)}"
-      class="mx-auto w-full max-w-7xl scroll-mt-20 px-6 py-24 sm:px-12 lg:py-32"
+      class="mx-auto w-full max-w-7xl scroll-mt-20 px-6 pt-10 pb-24 sm:px-12 lg:pt-12 lg:pb-32"
       aria-labelledby="mission-heading"
     >
       <h2
         id="mission-heading"
-        class="font-serif text-4xl font-bold leading-[1.05] tracking-tight text-balance sm:text-5xl lg:text-6xl"
+        class="type-section"
         th:text="${#strings.isEmpty(mission.heading) ? 'Mission' : mission.heading}"
       ></h2>
       <!-- The visible line is split into one span per word for the
@@ -435,27 +439,32 @@
         class="font-serif mx-auto mt-16 max-w-5xl text-center text-4xl leading-[1.3] text-balance sm:text-5xl lg:mt-24 lg:text-6xl"
         th:with="mark = ${mission.highlight},
                  hasMark = ${not #strings.isEmpty(mark) and #strings.contains(mission.message, mark)}"
-      ><span class="sr-only" th:text="${mission.message}"></span><span data-mission aria-hidden="true"><th:block th:unless="${hasMark}" th:text="${mission.message}"></th:block><th:block th:if="${hasMark}"><th:block th:text="${#strings.substringBefore(mission.message, mark)}"></th:block><span data-mission-mark class="relative mx-[0.14em] inline-block max-w-full"><svg class="mission-circle text-primary pointer-events-none absolute left-[-0.4em] top-[-0.22em] h-[calc(100%+0.44em)] w-[calc(100%+0.8em)]" viewBox="0 0 200 80" preserveAspectRatio="none" fill="none" aria-hidden="true"><path pathLength="1" d="M168 13C122 1 44 5 17 28C-3 46 26 75 102 74C166 73 199 55 192 33C186 14 139 4 86 9" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="relative" th:text="${mark}"></span></span><th:block th:text="${#strings.substringAfter(mission.message, mark)}"></th:block></th:block></span></p>
+      ><span class="sr-only" th:text="${mission.message}"></span><span data-mission aria-hidden="true"><th:block th:unless="${hasMark}" th:text="${mission.message}"></th:block><th:block th:if="${hasMark}"><th:block th:text="${#strings.substringBefore(mission.message, mark)}"></th:block><span data-mission-mark class="relative mx-[0.14em] inline-block max-w-full"><svg class="mission-circle text-primary pointer-events-none absolute left-[-0.4em] top-[-0.22em] h-[calc(100%+0.44em)] w-[calc(100%+0.8em)]" viewBox="0 0 200 80" preserveAspectRatio="none" fill="none" aria-hidden="true"><path pathLength="1" d="M150 16C112 2 42 6 18 30C-2 50 28 77 104 75C170 73 202 54 194 32C190 10 160 0 130 15" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="relative" th:text="${mark}"></span></span><th:block th:text="${#strings.substringAfter(mission.message, mark)}"></th:block></th:block></span></p>
     </section>
     </th:block>
 
-    <!-- Influence. The page's closing statement, so it is the one dark band:
+    <!-- Influence. The page's one deliberate dark band (light-only theme):
          neutral ink with the figures in the peach key colour (7.07:1 on the
-         ink - the colour that can't carry text on cream can here).
-         Columns are divided by hairlines, not boxed. Figures are sized off the
-         whole grid (one container), not each column: the middle column is
-         narrower by its double padding, and per-column sizing made its figure
-         visibly smaller. 5.2cqi keeps ">1,000,000" on one line in an outer
-         column; 17cqi does the same when the columns stack.
-         A "goal" column sets its figure in italic: it is an aspiration, not a
-         result, and should not read as one.
-         Facts and lists are textareas, one entry per line (split on the
-         &#10; newline below); a fact line is "<figure> <label>". -->
+         ink). data-paper-crisp: its edges stay clean while scrolling - the
+         dot dissolve is kept for the light paper changes only.
+         Not three equal big-number columns: a column marked "Lead" in
+         settings (the local results, with their breakdown and schools) takes
+         two of four tracks on desktop with a larger figure, and the others
+         sit beside it, smaller, in their original order. With no lead set it
+         falls back to three equal columns. Columns are divided by hairlines,
+         not boxed. Figures are sized off the whole grid (one container):
+         17cqi stacked, 5.2cqi in three equal columns, and from lg 3.6cqi
+         beside the lead / 7.5cqi on the lead, each keeping ">1,000,000" on
+         one line in its column.
+         A "goal" column sets its figure in italic: an aspiration, not a
+         result. Facts and lists are textareas, one entry per line (split on
+         the &#10; newline below); a fact line is "<figure> <label>". -->
     <th:block th:with="inf = ${theme.config?.influence}">
     <section
       id="influence"
       data-snap-section
       data-paper="neutral"
+      data-paper-crisp
       th:if="${inf != null and not #lists.isEmpty(inf.columns)}"
       class="bg-neutral text-neutral-content scroll-mt-20 antialiased"
       aria-labelledby="influence-heading"
@@ -463,17 +472,17 @@
       <div class="mx-auto w-full max-w-7xl px-6 py-24 sm:px-12 lg:py-32">
         <h2
           id="influence-heading"
-          class="font-serif text-4xl font-bold leading-[1.05] tracking-tight text-balance sm:text-5xl lg:text-6xl"
+          class="type-section"
           th:text="${#strings.isEmpty(inf.heading) ? 'Influence' : inf.heading}"
         ></h2>
 
         <div
-          class="@container mt-16 grid grid-cols-1 gap-y-14 md:grid-cols-3 md:gap-y-0 md:divide-x md:divide-neutral-content/15 lg:mt-20"
+          class="@container mt-16 grid grid-cols-1 gap-y-14 md:grid-cols-3 md:gap-y-0 md:divide-x md:divide-neutral-content/15 lg:mt-20 lg:grid-flow-col lg:grid-cols-none lg:auto-cols-fr"
         >
           <div
             th:each="col, stat : ${inf.columns}"
             class="border-neutral-content/15 md:px-8 md:first:pl-0 md:last:pr-0 lg:px-12"
-            th:classappend="${not stat.first} ? 'border-t pt-14 md:border-t-0 md:pt-0'"
+            th:classappend="${(not stat.first ? 'border-t pt-14 md:border-t-0 md:pt-0 ' : '') + (col.featured ? 'lg:col-span-2' : '')}"
           >
             <p
               th:if="${not #strings.isEmpty(col.label)}"
@@ -483,13 +492,14 @@
             <p
               th:if="${not #strings.isEmpty(col.value)}"
               class="font-serif text-primary mt-3 text-[min(17cqi,5rem)] font-bold wrap-anywhere md:text-[min(5.2cqi,5rem)] leading-none tracking-tight tabular-nums"
-              th:classappend="${col.goal} ? 'italic'"
+              th:classappend="${(col.goal ? 'italic ' : '') + (col.featured ? 'lg:text-[min(7.5cqi,6.5rem)]' : 'lg:text-[min(3.6cqi,3.25rem)]')}"
               th:text="${col.value}"
             ></p>
             <p
               th:if="${not #strings.isEmpty(col.unit)}"
               th:text="${col.unit}"
               class="mt-3 text-xl"
+              th:classappend="${col.featured} ? 'lg:text-2xl'"
             ></p>
 
             <dl
@@ -549,12 +559,12 @@
       id="pitches"
       data-snap-section
       th:if="${pitch != null and not #lists.isEmpty(pitch.items)}"
-      class="mx-auto w-full max-w-7xl scroll-mt-20 px-6 py-24 sm:px-12 lg:py-32"
+      class="mx-auto w-full max-w-7xl scroll-mt-20 px-6 pt-24 pb-14 sm:px-12 lg:pt-32 lg:pb-20"
       aria-labelledby="pitches-heading"
     >
       <h2
         id="pitches-heading"
-        class="font-serif max-w-3xl text-4xl font-bold leading-[1.05] tracking-tight text-balance sm:text-5xl lg:text-6xl"
+        class="type-section max-w-3xl"
         th:text="${#strings.isEmpty(pitch.heading) ? 'We also pitched to amplify awareness…' : pitch.heading}"
       ></h2>
 
@@ -577,7 +587,7 @@
             <figcaption class="mt-6">
               <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
                 <h3
-                  class="font-serif text-2xl font-bold tracking-tight"
+                  class="type-title"
                   th:text="${item.title}"
                 ></h3>
                 <span
@@ -620,52 +630,47 @@
     </th:block>
 
     <!-- Positive Progress. The outcomes are the payoff, so they are the
-         large type here and the paragraph is the supporting voice - the
-         reverse of a bulleted afterthought under a centred block of text.
-         Outcomes are a ruled list (hairline above each, one below the last),
-         not cards, with a sky icon disc echoing the Challenges list: the
-         problems there, the progress here. -->
+         largest type in the section: full-width statements, each led by a
+         small deep-peach icon, no discs and no rules. That keeps it a
+         different layout family from the Challenges list (icon discs in a
+         two-column grid) and from the side-by-side splits above it.
+         Heading and paragraph stack (no split header). The top padding is
+         tighter so it reads as a pair with Pitches. -->
     <th:block th:with="prog = ${theme.config?.progress}">
     <section
       id="progress"
       data-snap-section
       th:if="${prog != null and not #lists.isEmpty(prog.outcomes)}"
-      class="mx-auto w-full max-w-7xl scroll-mt-20 px-6 py-24 sm:px-12 lg:py-32"
+      class="mx-auto w-full max-w-7xl scroll-mt-20 px-6 pt-10 pb-24 sm:px-12 lg:pt-12 lg:pb-32"
       aria-labelledby="progress-heading"
     >
-      <div class="grid grid-cols-1 gap-y-12 lg:grid-cols-12 lg:items-center lg:gap-x-16">
-        <div class="lg:col-span-5">
-          <h2
-            id="progress-heading"
-            class="font-serif text-4xl font-bold leading-[1.05] tracking-tight text-balance sm:text-5xl lg:text-6xl"
-            th:text="${#strings.isEmpty(prog.heading) ? 'Positive Progress' : prog.heading}"
-          ></h2>
-          <p
-            th:if="${not #strings.isEmpty(prog.body)}"
-            th:text="${prog.body}"
-            class="mt-8 max-w-[56ch] text-lg leading-[1.75] text-pretty text-(--color-ink-muted)"
-          ></p>
-        </div>
-
-        <ul class="lg:col-span-6 lg:col-start-7" role="list">
-          <li
-            th:each="item : ${prog.outcomes}"
-            class="border-base-300 flex items-center gap-5 border-t py-7 last:border-b sm:gap-7"
-          >
-            <span
-              class="bg-accent text-accent-content grid size-12 shrink-0 place-items-center rounded-full sm:size-14"
-            >
-              <svg
-                th:replace="~{partials/icon :: icon(${item.icon}, 'size-6 sm:size-7')}"
-              ></svg>
-            </span>
-            <p
-              class="font-serif min-w-0 text-2xl leading-snug text-balance sm:text-[1.75rem]"
-              th:text="${item.text}"
-            ></p>
-          </li>
-        </ul>
+      <div class="max-w-3xl">
+        <h2
+          id="progress-heading"
+          class="type-section"
+          th:text="${#strings.isEmpty(prog.heading) ? 'Positive Progress' : prog.heading}"
+        ></h2>
+        <p
+          th:if="${not #strings.isEmpty(prog.body)}"
+          th:text="${prog.body}"
+          class="mt-6 max-w-[62ch] text-lg leading-[1.75] text-pretty text-(--color-ink-muted)"
+        ></p>
       </div>
+
+      <ul class="mt-14 space-y-8 lg:mt-20 lg:space-y-10" role="list">
+        <li
+          th:each="item : ${prog.outcomes}"
+          class="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-4 sm:gap-x-6"
+        >
+          <svg
+            th:replace="~{partials/icon :: icon(${item.icon}, 'mt-[0.2em] size-7 text-(--color-link) sm:size-9 lg:size-11')}"
+          ></svg>
+          <p
+            class="font-serif min-w-0 text-3xl leading-[1.15] tracking-[-0.02em] text-balance sm:text-4xl lg:text-5xl"
+            th:text="${item.text}"
+          ></p>
+        </li>
+      </ul>
     </section>
     </th:block>
   </th:block>

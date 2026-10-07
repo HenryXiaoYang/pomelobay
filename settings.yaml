@@ -51,6 +51,16 @@ spec:
           label: Description
           rows: 4
           value: ""
+        - $formkit: text
+          name: cta_label
+          label: Button label
+          help: Optional. Short, one line (e.g. Join Us). Shown only with a link.
+          value: ""
+        - $formkit: text
+          name: cta_url
+          label: Button link
+          help: A page path such as /join, or a full URL
+          value: ""
         - $formkit: array
           name: slides
           label: Carousel images
@@ -213,7 +223,7 @@ spec:
           value:
             - icon: map-pin
               title: "Migrant children"
-              text: "Migrant children are minors aged 0–17 who currently live in a region different from where their hukou is registered."
+              text: "Migrant children are minors aged 0-17 who currently live in a region different from where their hukou is registered."
             - icon: id-card
               title: "Hukou"
               text: "Hukou is a household registration system in mainland China that gives hukou holders entitlements in their own town, city, province or region, such as access to hospitals and schools."
@@ -394,6 +404,11 @@ spec:
               name: unit
               label: Unit
               value: ""
+            - $formkit: checkbox
+              name: featured
+              label: Lead column
+              help: Shown wider with a larger figure on desktop. Use on one column.
+              value: false
             - $formkit: checkbox
               name: goal
               label: This is a goal, not a result

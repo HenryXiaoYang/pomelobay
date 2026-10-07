@@ -27,7 +27,8 @@
  * Cost: a frame is a few solid fills plus one tiled fill per screened row,
  * from cell-sized patterns cached per level. The loop runs only while there is
  * motion or a screen still closing, then draws one last clean frame and stops.
- * Under prefers-reduced-motion the screen never opens.
+ * Under prefers-reduced-motion (no Lenis) the canvas doesn't run at all and
+ * the sections keep their own flat backgrounds: same papers, plain edges.
  */
 
 /** CSS px between dot centres: fine enough to read as a tint, coarse enough that a dot is a dot. */
@@ -49,7 +50,7 @@ const FULL = Math.SQRT1_2;
 /** Coverage of a dot inscribed in its cell - past this, neighbours overlap. */
 const KISS = Math.PI / 4;
 
-const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
+import { getLenis } from "./smooth-scroll";
 
 interface Edge {
   /** Document y where the two papers meet. */
@@ -109,7 +110,14 @@ export function initPaper(): void {
     tokens.getPropertyValue(`--color-${name ?? "base-100"}`).trim() ||
     tokens.getPropertyValue("--color-base-100").trim();
   const base = paperOf("base-100");
-  const still = window.matchMedia(REDUCED_MOTION).matches;
+
+  // Scroll comes from Lenis's own event, not a window scroll listener. No
+  // Lenis means reduced motion (or smooth scroll failed): the screen would
+  // never open then anyway, and a canvas that only paints solid papers looks
+  // exactly like the sections' own backgrounds - so leave those in place
+  // and don't run the canvas at all.
+  const lenis = getLenis();
+  if (!lenis) return;
 
   // The canvas is hidden in forced-colors mode anyway (see CSS); don't spend
   // a frame loop on it. And if the paper tokens didn't resolve - the
@@ -176,6 +184,8 @@ export function initPaper(): void {
           top: rect.top + scrollY,
           bottom: rect.bottom + scrollY,
           paper: paperOf((el as HTMLElement).dataset["paper"]),
+          // data-paper-crisp: this block's edges never break into a screen
+          crisp: (el as HTMLElement).hasAttribute("data-paper-crisp"),
         };
       });
 
@@ -188,6 +198,9 @@ export function initPaper(): void {
       const prev = blocks[i - 1]!;
       const next = blocks[i]!;
       if (prev.paper === next.paper) continue;
+      // A crisp block still gets its paper (the segment above), just with a
+      // plain edge: no band means the screen never opens there.
+      if (prev.crisp || next.crisp) continue;
       const gap = Math.max(0, next.top - prev.bottom);
       const atNext = next.paper !== base;
       edges.push({
@@ -289,11 +302,9 @@ export function initPaper(): void {
     lastY = y;
     lastT = now;
 
-    if (!still) {
-      const target = Math.min(1, speed / FULL_SPEED);
-      open = target > open ? open + (target - open) * ATTACK : open * Math.exp(-dt / RELEASE_MS);
-      if (open < 0.01) open = 0;
-    }
+    const target = Math.min(1, speed / FULL_SPEED);
+    open = target > open ? open + (target - open) * ATTACK : open * Math.exp(-dt / RELEASE_MS);
+    if (open < 0.01) open = 0;
 
     draw(y, open);
     if (open > 0) frame = requestAnimationFrame(tick);
@@ -327,7 +338,7 @@ export function initPaper(): void {
   // sections keep their own flat colours.
   root.classList.add("paper-on");
 
-  addEventListener("scroll", wake, { passive: true });
+  lenis.on("scroll", wake);
   addEventListener("resize", remeasure);
   // Images, fonts and settings-driven content all move the edges
   new ResizeObserver(() => {

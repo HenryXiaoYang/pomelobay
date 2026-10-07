@@ -177,8 +177,9 @@ function loadMotion(): void {
 }
 
 function init(): void {
-  initPaper();
+  // Smooth scroll first: the paper draws on Lenis's scroll event
   initSmoothScroll();
+  initPaper();
   loadMotion();
   document
     .querySelectorAll<HTMLElement>("[data-carousel]")
