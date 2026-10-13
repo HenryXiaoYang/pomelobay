@@ -1,0 +1,24 @@
+<!doctype html>
+<html xmlns:th="https://www.thymeleaf.org">
+  <!-- Plain Thymeleaf fragment - no build tooling required.
+       Labels read straight off theme.config so they stay editable. -->
+  <nav
+    th:fragment="pagination (pages)"
+    th:if="${pages.hasPrevious() or pages.hasNext()}"
+    th:with="t = ${theme.config?.labels}"
+    class="join mt-12 flex justify-center"
+  >
+    <a
+      class="join-item btn btn-sm"
+      th:if="${pages.hasPrevious()}"
+      th:href="@{${pages.prevUrl}}"
+      th:text="${#strings.isEmpty(t?.prev_page) ? 'Previous' : t.prev_page}"
+    ></a>
+    <a
+      class="join-item btn btn-sm"
+      th:if="${pages.hasNext()}"
+      th:href="@{${pages.nextUrl}}"
+      th:text="${#strings.isEmpty(t?.next_page) ? 'Next' : t.next_page}"
+    ></a>
+  </nav>
+</html>

@@ -1,0 +1,13 @@
+<!doctype html>
+<html xmlns:th="https://www.thymeleaf.org">
+  <!-- daisyUI list component; list-row draws its own divider -->
+  <ul th:fragment="postList (posts)" class="list text-base">
+    <li th:each="post : ${posts.items}" class="list-row px-0">
+      <a
+        class="link link-hover list-col-grow font-medium"
+        th:href="@{${post.status.permalink}}"
+        th:text="${post.spec.title}"
+      ></a>
+    </li>
+  </ul>
+</html>

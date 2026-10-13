@@ -1,0 +1,42 @@
+name: Build theme
+
+# Manual only: Actions → "Build theme" → Run workflow, then pick the branch.
+# Produces the installable theme zip (Console → Themes → Install) as a
+# workflow artifact. Publishing a GitHub release is handled by cd.yaml.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # Version comes from "packageManager" in package.json
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # typecheck + minified CSS/JS + theme-package → dist/<name>-<version>.zip
+      - run: pnpm build
+
+      - name: Read theme name and version
+        id: theme
+        run: |
+          name=$(sed -nE 's/^  name: *"?([^"]+)"?$/\1/p' theme.yaml | head -1)
+          version=$(sed -nE 's/^  version: *"?([^"]+)"?$/\1/p' theme.yaml | head -1)
+          echo "artifact=${name}-${version}" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ${{ steps.theme.outputs.artifact }}
+          path: dist/*.zip
+          if-no-files-found: error

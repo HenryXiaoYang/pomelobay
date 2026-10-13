@@ -4,14 +4,23 @@
   th:replace="~{layout :: html(head = null,content = ~{::content})}"
 >
   <th:block th:fragment="content">
-    <h1>标签</h1>
-    <ul>
-      <li th:each="tag : ${tags}">
-        <a
-          th:href="@{${tag.status.permalink}}"
-          th:text="${tag.spec.displayName}"
-        ></a>
-      </li>
-    </ul>
+    <div
+      class="mx-auto w-full max-w-3xl px-6 py-16 sm:px-10"
+      th:with="t = ${theme.config?.labels}"
+    >
+      <h1
+        class="text-3xl font-bold sm:text-4xl"
+        th:text="${#strings.isEmpty(t?.tags_title) ? 'Tags' : t.tags_title}"
+      ></h1>
+      <ul class="mt-8 flex flex-wrap gap-2">
+        <li th:each="tag : ${tags}">
+          <a
+            class="badge badge-accent badge-lg"
+            th:href="@{${tag.status.permalink}}"
+            th:text="${tag.spec.displayName}"
+          ></a>
+        </li>
+      </ul>
+    </div>
   </th:block>
 </html>
