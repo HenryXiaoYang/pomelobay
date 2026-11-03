@@ -1,7 +1,7 @@
 apiVersion: v1alpha1
 kind: Setting
 metadata:
-  name: theme-starter-setting
+  name: theme-pomelobay-setting
 spec:
   # The palette lives in src/css/main.css as a daisyUI theme - it is not
   # exposed here, because changing one color breaks the verified contrast set.
